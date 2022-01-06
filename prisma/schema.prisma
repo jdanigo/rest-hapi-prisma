@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Usuarios {
+  id            Int             @id @default(autoincrement())
+  nombre        String
+  correo        String          @unique
+  balance       Int
+  ordenes       Ordenes[]
+  transacciones Transacciones[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model Transacciones {
+  id        Int       @id @default(autoincrement())
+  usuario   Usuarios? @relation(fields: [usuarioId], references: [id])
+  usuarioId Int?
+  tipo      String
+  monto     Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+
+model Ordenes {
+  id        Int            @id @default(autoincrement())
+  total     Int
+  direccion String
+  usuario   Usuarios?      @relation(fields: [usuarioId], references: [id])
+  usuarioId Int?
+  items     OrdenesItems[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+model OrdenesItems {
+  id         Int        @id @default(autoincrement())
+  orden      Ordenes?   @relation(fields: [ordenId], references: [id])
+  ordenId    Int
+  producto   Productos? @relation(fields: [productoId], references: [id])
+  productoId Int
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Productos {
+  id                    Int            @id @default(autoincrement())
+  nombre                String         @unique
+  precio                Int
+  categoria             Categorias?    @relation(fields: [categoriaId], references: [id])
+  categoriaId           Int
+  productosOrdenesItems OrdenesItems[]
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+}
+
+model Categorias {
+  id        Int         @id @default(autoincrement())
+  nombre    String      @unique
+  productos Productos[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
